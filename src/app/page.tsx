@@ -88,11 +88,31 @@ export default function Home() {
                 // 변동값에 지정된 타입(할아버지 등)을 고려하여 nameType 선택
                 const voiceTypeForSelection = existingInChangable.type; // 할아버지, 여자아이 등
                 const availableNames = Object.keys(NameType).filter((name) => NameType[name].sex.includes(voiceTypeForSelection));
+                // 가장 적게 사용된 nameType 찾기
+                const leastUsedNameType = availableNames.reduce((least, current) => {
+                    const leastCount = Array.from(usedCombinations).filter((combo: any) => combo.startsWith(least)).length;
+                    const currentCount = Array.from(usedCombinations).filter((combo: any) => combo.startsWith(current)).length;
+                    return currentCount < leastCount ? current : least;
+                });
+                console.log('Least used nameType:', leastUsedNameType);
+
                 const selectedNameType =
                     availableNames.length > 0 ? availableNames[Math.floor(Math.random() * availableNames.length)] : Object.keys(NameType)[0];
 
                 // voiceType 선택 - 이미 사용된 nameType에 대해 중복되지 않는 voiceType 선택
                 const availableVoiceTypes = Object.keys(NameType[selectedNameType].voiceType);
+                // 가장 적게 사용된 voiceType 찾기
+                const leastUsedVoiceType = availableVoiceTypes.reduce((least, current) => {
+                    const leastCount = Array.from(usedCombinations).filter(
+                        (combo: any) => combo.startsWith(selectedNameType) && combo.includes(least)
+                    ).length;
+                    const currentCount = Array.from(usedCombinations).filter(
+                        (combo: any) => combo.startsWith(selectedNameType) && combo.includes(current)
+                    ).length;
+                    return currentCount < leastCount ? current : least;
+                });
+                console.log('Least used voiceType for', selectedNameType, ':', leastUsedVoiceType);
+
                 // 이미 사용된 nameType+voiceType 조합 필터링
                 const filteredVoiceTypes = availableVoiceTypes.filter((vType) => !usedCombinations.has(`${selectedNameType}-${vType}`));
 
