@@ -9,7 +9,7 @@ import { totalCharacter } from '@/configs/TotalCharacter';
 import { NameType, VoiceType } from '@/configs/NameType';
 
 export default function Home() {
-    const [characterLine, setCharacterLine] = React.useState<string>('');
+    const [characterLine, setCharacterLine] = React.useState<string>('Q4');
 
     const [generatedCharacterLine, setGeneratedCharacterLine] = React.useState<string>('');
     const [generatedVoiceLine, setGeneratedVoiceLine] = React.useState<string>('');
@@ -81,6 +81,9 @@ export default function Home() {
             if (existingInStored) {
                 // 이미 storedValue에 있으면 그대로 사용
                 acc.push(existingInStored);
+                usedCombinations.add(`${existingInStored.nameType}-${existingInStored.voiceType}`);
+                usedCombinations.add(`${existingInStored.nameType}-${existingInStored.voiceType}-${existingInStored.voiceValue}`);
+                return acc;
             } else if (existingInChangable) {
                 // changableValue에 있으면, 해당 타입과 번호를 사용하여 새로운 캐릭터 생성
                 const baseType = detail?.type;
@@ -90,56 +93,73 @@ export default function Home() {
                 const availableNames = Object.keys(NameType).filter((name) => NameType[name].sex.includes(voiceTypeForSelection));
                 // 가장 적게 사용된 nameType 찾기
                 const leastUsedNameType = availableNames.reduce((least, current) => {
-                    const leastCount = Array.from(usedCombinations).filter((combo: any) => combo.startsWith(least)).length;
-                    const currentCount = Array.from(usedCombinations).filter((combo: any) => combo.startsWith(current)).length;
-                    return currentCount < leastCount ? current : least;
-                });
-                console.log('Least used nameType:', leastUsedNameType);
+                    // 정확히 nameType만 매칭되도록 수정
+                    const leastCount = Array.from(usedCombinations).filter((combo: any) => combo === least || combo.startsWith(`${least}-`)).length;
+                    const currentCount = Array.from(usedCombinations).filter(
+                        (combo: any) => combo === current || combo.startsWith(`${current}-`)
+                    ).length;
 
-                const selectedNameType =
-                    availableNames.length > 0 ? availableNames[Math.floor(Math.random() * availableNames.length)] : Object.keys(NameType)[0];
+                    // 모든 값의 length가 같을 경우 랜덤하게 선택
+                    if (leastCount === currentCount) {
+                        return Math.random() < 0.5 ? current : least;
+                    }
+
+                    return currentCount < leastCount ? current : least;
+                }, availableNames[0]);
 
                 // voiceType 선택 - 이미 사용된 nameType에 대해 중복되지 않는 voiceType 선택
-                const availableVoiceTypes = Object.keys(NameType[selectedNameType].voiceType);
-                // 가장 적게 사용된 voiceType 찾기
+                const availableVoiceTypes = Object.keys(NameType[leastUsedNameType].voiceType);
                 const leastUsedVoiceType = availableVoiceTypes.reduce((least, current) => {
                     const leastCount = Array.from(usedCombinations).filter(
-                        (combo: any) => combo.startsWith(selectedNameType) && combo.includes(least)
+                        (combo: any) => combo.startsWith(leastUsedNameType) && combo.includes(least)
                     ).length;
                     const currentCount = Array.from(usedCombinations).filter(
-                        (combo: any) => combo.startsWith(selectedNameType) && combo.includes(current)
+                        (combo: any) => combo.startsWith(leastUsedNameType) && combo.includes(current)
                     ).length;
+
+                    // 모든 값의 length가 같을 경우 랜덤하게 선택
+                    if (leastCount === currentCount) {
+                        return Math.random() < 0.5 ? current : least;
+                    }
+
                     return currentCount < leastCount ? current : least;
-                });
-                console.log('Least used voiceType for', selectedNameType, ':', leastUsedVoiceType);
+                }, availableVoiceTypes[0]);
 
-                // 이미 사용된 nameType+voiceType 조합 필터링
-                const filteredVoiceTypes = availableVoiceTypes.filter((vType) => !usedCombinations.has(`${selectedNameType}-${vType}`));
+                // voiceValue 선택 - 가장 적게 사용된 조합 찾기
+                const availableVoiceValues = NameType[leastUsedNameType].voiceType[leastUsedVoiceType as VoiceType] || [];
+                console.log('<ssong> availableNames   ::', availableNames);
+                console.log('<ssong> target   ::', (detail?.type as string) + detail?.number);
+                console.log('<ssong> availableVoiceValues   ::', availableVoiceValues);
+                console.log('<ssong> leastUsedNameType   ::', leastUsedNameType);
+                console.log('<ssong> leastUsedVoiceType   ::', leastUsedVoiceType);
+                console.log('<ssong> usedCombinations   ::', usedCombinations);
+                const leastUsedVoiceValue = availableVoiceValues.reduce((least, current) => {
+                    // 현재 nameType과 voiceType에 대해서만 voiceValue 사용 횟수를 계산
+                    const leastCount = Array.from(usedCombinations).filter((combo: any) =>
+                        combo.startsWith(`${leastUsedNameType}-${leastUsedVoiceType}-${least}`)
+                    ).length;
+                    const currentCount = Array.from(usedCombinations).filter((combo: any) =>
+                        combo.startsWith(`${leastUsedNameType}-${leastUsedVoiceType}-${current}`)
+                    ).length;
 
-                const selectedVoiceType =
-                    filteredVoiceTypes.length > 0
-                        ? filteredVoiceTypes[Math.floor(Math.random() * filteredVoiceTypes.length)]
-                        : availableVoiceTypes[Math.floor(Math.random() * availableVoiceTypes.length)];
+                    // 모든 값의 length가 같을 경우 랜덤하게 선택
+                    if (leastCount === currentCount) {
+                        return Math.random() < 0.5 ? current : least;
+                    }
 
-                // voiceValue 선택 - 이미 사용된 voiceType에 대해 중복되지 않는 voiceValue 선택
-                const availableVoiceValues = NameType[selectedNameType].voiceType[selectedVoiceType as VoiceType] || [];
-                const filteredVoiceValues = availableVoiceValues.filter(
-                    (vValue) => !usedCombinations.has(`${selectedNameType}-${selectedVoiceType}-${vValue}`)
-                );
+                    return currentCount < leastCount ? current : least;
+                }, availableVoiceValues[0]);
 
-                const selectedVoiceValue =
-                    filteredVoiceValues.length > 0
-                        ? filteredVoiceValues[Math.floor(Math.random() * filteredVoiceValues.length)]
-                        : availableVoiceValues[Math.floor(Math.random() * availableVoiceValues.length)];
+                console.log('<ssong> 사용됨   ::', `${leastUsedNameType}-${leastUsedVoiceType}-${leastUsedVoiceValue}`);
+                // 사용된 조합 추가
+                usedCombinations.add(`${leastUsedNameType}-${leastUsedVoiceType}`);
+                usedCombinations.add(`${leastUsedNameType}-${leastUsedVoiceType}-${leastUsedVoiceValue}`);
 
                 const containedMainChar = storedValue.find((item) => {
                     return `${item.type}${item.number}` === `${detail?.type}${detail?.number}`;
                 });
                 const containedSubChar = acc?.find((item: any) => item.originalText === `${detail?.type}${detail?.number}`);
 
-                // 사용된 조합 추가
-                usedCombinations.add(`${selectedNameType}-${selectedVoiceType}`);
-                usedCombinations.add(`${selectedNameType}-${selectedVoiceType}-${selectedVoiceValue}`);
                 if (detail?.originalText && detail?.originalText.length > 0 && (containedMainChar || containedSubChar)) {
                     const containedChar = containedMainChar || containedSubChar;
                     acc.push({
@@ -156,46 +176,78 @@ export default function Home() {
                 acc.push({
                     type: baseType,
                     number: detail?.number,
-                    nameType: selectedNameType,
-                    voiceType: selectedVoiceType,
-                    voiceValue: selectedVoiceValue,
+                    nameType: leastUsedNameType,
+                    voiceType: leastUsedVoiceType,
+                    voiceValue: leastUsedVoiceValue,
                     originalText: detail?.originalText,
                 });
             } else {
                 // 둘 다 없는 경우 기본 캐릭터 생성
                 const baseType = detail?.type; // 남자 또는 여자
+                console.log('<ssong> detail   ::', detail);
 
                 // 남자/여자에 맞는 기본 nameType 선택
                 // 남자는 어린이와 할아버지가 아닌 캐릭터, 여자는 여자아이가 아닌 캐릭터
                 const availableNames = Object.keys(NameType).filter((name) => {
                     const sexTypes = NameType[name].sex;
                     if (baseType === '남자') {
-                        return sexTypes.includes('남자') && !sexTypes.includes('남자아이') && !sexTypes.includes('할아버지');
+                        return sexTypes.includes('남자');
                     } else {
-                        return sexTypes.includes('여자') && !sexTypes.includes('여자아이');
+                        return sexTypes.includes('여자');
                     }
                 });
 
-                // 가능한 nameType이 없을 경우, 성별에 맞는 nameType이라도 선택
-                let selectedNameType;
-                if (availableNames.length > 0) {
-                    selectedNameType = availableNames[Math.floor(Math.random() * availableNames.length)];
-                } else {
-                    // 성별에 맞는 nameType 찾기 (fallback)
-                    const fallbackNames = Object.keys(NameType).filter((name) =>
-                        baseType === '남자' ? NameType[name].sex.includes('남자') : NameType[name].sex.includes('여자')
-                    );
-                    selectedNameType =
-                        fallbackNames.length > 0 ? fallbackNames[Math.floor(Math.random() * fallbackNames.length)] : Object.keys(NameType)[0];
-                }
+                // 가장 적게 사용된 nameType 찾기
+                const leastUsedNameType = availableNames.reduce((least: any, current) => {
+                    // 정확히 nameType만 매칭되도록 수정
+                    const leastCount = Array.from(usedCombinations).filter((combo: any) => combo === least || combo.startsWith(`${least}-`)).length;
+                    const currentCount = Array.from(usedCombinations).filter(
+                        (combo: any) => combo === current || combo.startsWith(`${current}-`)
+                    ).length;
 
-                // voiceType 선택
-                const availableVoiceTypes = Object.keys(NameType[selectedNameType].voiceType);
-                const selectedVoiceType = availableVoiceTypes[Math.floor(Math.random() * availableVoiceTypes.length)];
+                    // 모든 값의 length가 같을 경우 랜덤하게 선택
+                    if (leastCount === currentCount) {
+                        return Math.random() < 0.5 ? current : least;
+                    }
 
-                // voiceValue 선택
-                const availableVoiceValues = NameType[selectedNameType].voiceType[selectedVoiceType as VoiceType] || [];
-                const selectedVoiceValue = availableVoiceValues[Math.floor(Math.random() * availableVoiceValues.length)];
+                    return currentCount < leastCount ? current : least;
+                }, availableNames[0]);
+                // voiceType 선택 - 가장 적게 사용된 voiceType 찾기
+                const availableVoiceTypes = Object.keys(NameType[leastUsedNameType ?? baseType].voiceType);
+                const leastUsedVoiceType = availableVoiceTypes.reduce((least, current) => {
+                    const leastCount = Array.from(usedCombinations).filter(
+                        (combo: any) => combo.startsWith(leastUsedNameType) && combo.includes(least)
+                    ).length;
+                    const currentCount = Array.from(usedCombinations).filter(
+                        (combo: any) => combo.startsWith(leastUsedNameType) && combo.includes(current)
+                    ).length;
+
+                    // 모든 값의 length가 같을 경우 랜덤하게 선택
+                    if (leastCount === currentCount) {
+                        return Math.random() < 0.5 ? current : least;
+                    }
+
+                    return currentCount < leastCount ? current : least;
+                }, availableVoiceTypes[0]);
+
+                // voiceValue 선택 - 가장 적게 사용된 조합 찾기
+                const availableVoiceValues = NameType[leastUsedNameType].voiceType[leastUsedVoiceType as VoiceType] || [];
+                const leastUsedVoiceValue = availableVoiceValues.reduce((least, current) => {
+                    // 현재 nameType과 voiceType에 대해서만 voiceValue 사용 횟수를 계산
+                    const leastCount = Array.from(usedCombinations).filter((combo: any) =>
+                        combo.startsWith(`${leastUsedNameType}-${leastUsedVoiceType}-${least}`)
+                    ).length;
+                    const currentCount = Array.from(usedCombinations).filter((combo: any) =>
+                        combo.startsWith(`${leastUsedNameType}-${leastUsedVoiceType}-${current}`)
+                    ).length;
+
+                    // 모든 값의 length가 같을 경우 랜덤하게 선택
+                    if (leastCount === currentCount) {
+                        return Math.random() < 0.5 ? current : least;
+                    }
+
+                    return currentCount < leastCount ? current : least;
+                }, availableVoiceValues[0]);
 
                 const containedMainChar = storedValue.find((item) => {
                     return `${item.type}${item.number}` === `${detail?.type}${detail?.number}`;
@@ -203,8 +255,8 @@ export default function Home() {
                 const containedSubChar = acc?.find((item: any) => item.originalText === `${detail?.type}${detail?.number}`);
 
                 // 사용된 조합 추가
-                usedCombinations.add(`${selectedNameType}-${selectedVoiceType}`);
-                usedCombinations.add(`${selectedNameType}-${selectedVoiceType}-${selectedVoiceValue}`);
+                usedCombinations.add(`${leastUsedNameType}-${leastUsedVoiceType}`);
+                usedCombinations.add(`${leastUsedNameType}-${leastUsedVoiceType}-${leastUsedVoiceValue}`);
 
                 if (detail?.originalText && detail?.originalText.length > 0 && (containedMainChar || containedSubChar)) {
                     const containedChar = containedMainChar || containedSubChar;
@@ -222,9 +274,9 @@ export default function Home() {
                 acc.push({
                     type: baseType,
                     number: detail?.number,
-                    nameType: selectedNameType,
-                    voiceType: selectedVoiceType,
-                    voiceValue: selectedVoiceValue,
+                    nameType: leastUsedNameType,
+                    voiceType: leastUsedVoiceType,
+                    voiceValue: leastUsedVoiceValue,
                     originalText: detail?.originalText,
                 });
             }
