@@ -5,16 +5,44 @@ import React from 'react';
 import ConstInputArea from '@/components/ConstInputArea';
 import ChangeInputArea from '@/components/ChangeInputArea';
 import { useValueStore } from '@/store/ValueStore';
-import { totalCharacter } from '@/configs/TotalCharacter';
 import { NameType, VoiceType } from '@/configs/NameType';
+
+interface UsedCombinations {
+    nameTypes: Record<string, number>;
+    voiceTypes: Record<string, number>;
+    voiceValues: Record<string, number>;
+}
 
 export default function Home() {
     const [characterLine, setCharacterLine] = React.useState<string>('Q4');
+    const [excelInput, setExcelInput] = React.useState<string>('');
+    const [convertedInput, setConvertedInput] = React.useState<string[]>([]);
 
     const [generatedCharacterLine, setGeneratedCharacterLine] = React.useState<string>('');
     const [generatedVoiceLine, setGeneratedVoiceLine] = React.useState<string>('');
 
     const { storedValue, deleteStoredValue, changableValue, deleteChangableValue } = useValueStore();
+
+    const handleExcelInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const input = e.target.value;
+        setExcelInput(input);
+
+        // 줄바꿈으로 분리하고 빈 줄 제거
+        const lines = input.split('\n').filter((line) => line.trim());
+
+        // 각 줄을 totalCharacter 형식으로 변환
+        const converted = lines.map((line) => {
+            // 쉼표로 구분된 경우 첫 번째 값만 사용
+            const firstValue = line.split(',')[0].trim();
+            return `${firstValue}`;
+        });
+
+        setConvertedInput(converted);
+    };
+
+    React.useEffect(() => {
+        console.log('<ssong> convertedInput   ::', convertedInput);
+    }, [convertedInput]);
 
     const handleGenerate = () => {
         if (!characterLine) {
@@ -31,7 +59,7 @@ export default function Home() {
         }
 
         // 중복 제거된 totalCharacter 배열 생성
-        const uniqueCharacters = Array.from(new Set(totalCharacter));
+        const uniqueCharacters = Array.from(new Set(convertedInput));
 
         // 각 캐릭터를 분석하여 type과 number로 분리
         const characterDetails = uniqueCharacters
@@ -57,13 +85,29 @@ export default function Home() {
             })
             .filter(Boolean);
 
-        // 이미 사용된 조합을 추적할 Set
-        const usedCombinations = new Set();
+        // Set 대신 객체로 변경
+        const usedCombinations: UsedCombinations = {
+            nameTypes: {}, // nameType별 사용 횟수
+            voiceTypes: {}, // nameType-voiceType별 사용 횟수
+            voiceValues: {}, // nameType-voiceType-voiceValue별 사용 횟수
+        };
 
         // 기존 storedValue의 조합을 먼저 추가
         storedValue.forEach((item) => {
-            usedCombinations.add(`${item.nameType}-${item.voiceType}`);
-            usedCombinations.add(`${item.nameType}-${item.voiceType}-${item.voiceValue}`);
+            const nameType = item.nameType;
+            const voiceType = item.voiceType;
+            const voiceValue = item.voiceValue;
+
+            // nameType 카운트
+            usedCombinations.nameTypes[nameType] = (usedCombinations.nameTypes[nameType] || 0) + 1;
+
+            // voiceType 카운트
+            const voiceTypeKey = `${nameType}-${voiceType}`;
+            usedCombinations.voiceTypes[voiceTypeKey] = (usedCombinations.voiceTypes[voiceTypeKey] || 0) + 1;
+
+            // voiceValue 카운트
+            const voiceValueKey = `${nameType}-${voiceType}-${voiceValue}`;
+            usedCombinations.voiceValues[voiceValueKey] = (usedCombinations.voiceValues[voiceValueKey] || 0) + 1;
         });
 
         // 모든 캐릭터 정보 생성
@@ -81,8 +125,20 @@ export default function Home() {
             if (existingInStored) {
                 // 이미 storedValue에 있으면 그대로 사용
                 acc.push(existingInStored);
-                usedCombinations.add(`${existingInStored.nameType}-${existingInStored.voiceType}`);
-                usedCombinations.add(`${existingInStored.nameType}-${existingInStored.voiceType}-${existingInStored.voiceValue}`);
+                const nameType = existingInStored.nameType;
+                const voiceType = existingInStored.voiceType;
+                const voiceValue = existingInStored.voiceValue;
+
+                // nameType 카운트
+                usedCombinations.nameTypes[nameType] = (usedCombinations.nameTypes[nameType] || 0) + 1;
+
+                // voiceType 카운트
+                const voiceTypeKey = `${nameType}-${voiceType}`;
+                usedCombinations.voiceTypes[voiceTypeKey] = (usedCombinations.voiceTypes[voiceTypeKey] || 0) + 1;
+
+                // voiceValue 카운트
+                const voiceValueKey = `${nameType}-${voiceType}-${voiceValue}`;
+                usedCombinations.voiceValues[voiceValueKey] = (usedCombinations.voiceValues[voiceValueKey] || 0) + 1;
                 return acc;
             } else if (existingInChangable) {
                 // changableValue에 있으면, 해당 타입과 번호를 사용하여 새로운 캐릭터 생성
@@ -93,67 +149,53 @@ export default function Home() {
                 const availableNames = Object.keys(NameType).filter((name) => NameType[name].sex.includes(voiceTypeForSelection));
                 // 가장 적게 사용된 nameType 찾기
                 const leastUsedNameType = availableNames.reduce((least, current) => {
-                    // 정확히 nameType만 매칭되도록 수정
-                    const leastCount = Array.from(usedCombinations).filter((combo: any) => combo === least || combo.startsWith(`${least}-`)).length;
-                    const currentCount = Array.from(usedCombinations).filter(
-                        (combo: any) => combo === current || combo.startsWith(`${current}-`)
-                    ).length;
+                    const leastCount = usedCombinations.nameTypes[least] || 0;
+                    const currentCount = usedCombinations.nameTypes[current] || 0;
 
-                    // 모든 값의 length가 같을 경우 랜덤하게 선택
                     if (leastCount === currentCount) {
                         return Math.random() < 0.5 ? current : least;
                     }
-
                     return currentCount < leastCount ? current : least;
                 }, availableNames[0]);
 
                 // voiceType 선택 - 이미 사용된 nameType에 대해 중복되지 않는 voiceType 선택
                 const availableVoiceTypes = Object.keys(NameType[leastUsedNameType].voiceType);
                 const leastUsedVoiceType = availableVoiceTypes.reduce((least, current) => {
-                    const leastCount = Array.from(usedCombinations).filter(
-                        (combo: any) => combo.startsWith(leastUsedNameType) && combo.includes(least)
-                    ).length;
-                    const currentCount = Array.from(usedCombinations).filter(
-                        (combo: any) => combo.startsWith(leastUsedNameType) && combo.includes(current)
-                    ).length;
+                    const leastKey = `${leastUsedNameType}-${least}`;
+                    const currentKey = `${leastUsedNameType}-${current}`;
 
-                    // 모든 값의 length가 같을 경우 랜덤하게 선택
+                    const leastCount = usedCombinations.voiceTypes[leastKey] || 0;
+                    const currentCount = usedCombinations.voiceTypes[currentKey] || 0;
+
                     if (leastCount === currentCount) {
                         return Math.random() < 0.5 ? current : least;
                     }
-
                     return currentCount < leastCount ? current : least;
                 }, availableVoiceTypes[0]);
 
                 // voiceValue 선택 - 가장 적게 사용된 조합 찾기
                 const availableVoiceValues = NameType[leastUsedNameType].voiceType[leastUsedVoiceType as VoiceType] || [];
-                console.log('<ssong> availableNames   ::', availableNames);
-                console.log('<ssong> target   ::', (detail?.type as string) + detail?.number);
-                console.log('<ssong> availableVoiceValues   ::', availableVoiceValues);
-                console.log('<ssong> leastUsedNameType   ::', leastUsedNameType);
-                console.log('<ssong> leastUsedVoiceType   ::', leastUsedVoiceType);
-                console.log('<ssong> usedCombinations   ::', usedCombinations);
                 const leastUsedVoiceValue = availableVoiceValues.reduce((least, current) => {
-                    // 현재 nameType과 voiceType에 대해서만 voiceValue 사용 횟수를 계산
-                    const leastCount = Array.from(usedCombinations).filter((combo: any) =>
-                        combo.startsWith(`${leastUsedNameType}-${leastUsedVoiceType}-${least}`)
-                    ).length;
-                    const currentCount = Array.from(usedCombinations).filter((combo: any) =>
-                        combo.startsWith(`${leastUsedNameType}-${leastUsedVoiceType}-${current}`)
-                    ).length;
+                    const leastKey = `${leastUsedNameType}-${leastUsedVoiceType}-${least}`;
+                    const currentKey = `${leastUsedNameType}-${leastUsedVoiceType}-${current}`;
 
-                    // 모든 값의 length가 같을 경우 랜덤하게 선택
+                    const leastCount = usedCombinations.voiceValues[leastKey] || 0;
+                    const currentCount = usedCombinations.voiceValues[currentKey] || 0;
+
                     if (leastCount === currentCount) {
                         return Math.random() < 0.5 ? current : least;
                     }
-
                     return currentCount < leastCount ? current : least;
                 }, availableVoiceValues[0]);
 
-                console.log('<ssong> 사용됨   ::', `${leastUsedNameType}-${leastUsedVoiceType}-${leastUsedVoiceValue}`);
                 // 사용된 조합 추가
-                usedCombinations.add(`${leastUsedNameType}-${leastUsedVoiceType}`);
-                usedCombinations.add(`${leastUsedNameType}-${leastUsedVoiceType}-${leastUsedVoiceValue}`);
+                const nameTypeKey = leastUsedNameType;
+                const voiceTypeKey = `${leastUsedNameType}-${leastUsedVoiceType}`;
+                const voiceValueKey = `${leastUsedNameType}-${leastUsedVoiceType}-${leastUsedVoiceValue}`;
+
+                usedCombinations.nameTypes[nameTypeKey] = (usedCombinations.nameTypes[nameTypeKey] || 0) + 1;
+                usedCombinations.voiceTypes[voiceTypeKey] = (usedCombinations.voiceTypes[voiceTypeKey] || 0) + 1;
+                usedCombinations.voiceValues[voiceValueKey] = (usedCombinations.voiceValues[voiceValueKey] || 0) + 1;
 
                 const containedMainChar = storedValue.find((item) => {
                     return `${item.type}${item.number}` === `${detail?.type}${detail?.number}`;
@@ -184,7 +226,6 @@ export default function Home() {
             } else {
                 // 둘 다 없는 경우 기본 캐릭터 생성
                 const baseType = detail?.type; // 남자 또는 여자
-                console.log('<ssong> detail   ::', detail);
 
                 // 남자/여자에 맞는 기본 nameType 선택
                 // 남자는 어린이와 할아버지가 아닌 캐릭터, 여자는 여자아이가 아닌 캐릭터
@@ -198,54 +239,42 @@ export default function Home() {
                 });
 
                 // 가장 적게 사용된 nameType 찾기
-                const leastUsedNameType = availableNames.reduce((least: any, current) => {
-                    // 정확히 nameType만 매칭되도록 수정
-                    const leastCount = Array.from(usedCombinations).filter((combo: any) => combo === least || combo.startsWith(`${least}-`)).length;
-                    const currentCount = Array.from(usedCombinations).filter(
-                        (combo: any) => combo === current || combo.startsWith(`${current}-`)
-                    ).length;
+                const leastUsedNameType = availableNames.reduce((least, current) => {
+                    const leastCount = usedCombinations.nameTypes[least] || 0;
+                    const currentCount = usedCombinations.nameTypes[current] || 0;
 
-                    // 모든 값의 length가 같을 경우 랜덤하게 선택
                     if (leastCount === currentCount) {
                         return Math.random() < 0.5 ? current : least;
                     }
-
                     return currentCount < leastCount ? current : least;
                 }, availableNames[0]);
                 // voiceType 선택 - 가장 적게 사용된 voiceType 찾기
                 const availableVoiceTypes = Object.keys(NameType[leastUsedNameType ?? baseType].voiceType);
                 const leastUsedVoiceType = availableVoiceTypes.reduce((least, current) => {
-                    const leastCount = Array.from(usedCombinations).filter(
-                        (combo: any) => combo.startsWith(leastUsedNameType) && combo.includes(least)
-                    ).length;
-                    const currentCount = Array.from(usedCombinations).filter(
-                        (combo: any) => combo.startsWith(leastUsedNameType) && combo.includes(current)
-                    ).length;
+                    const leastKey = `${leastUsedNameType}-${least}`;
+                    const currentKey = `${leastUsedNameType}-${current}`;
 
-                    // 모든 값의 length가 같을 경우 랜덤하게 선택
+                    const leastCount = usedCombinations.voiceTypes[leastKey] || 0;
+                    const currentCount = usedCombinations.voiceTypes[currentKey] || 0;
+
                     if (leastCount === currentCount) {
                         return Math.random() < 0.5 ? current : least;
                     }
-
                     return currentCount < leastCount ? current : least;
                 }, availableVoiceTypes[0]);
 
                 // voiceValue 선택 - 가장 적게 사용된 조합 찾기
                 const availableVoiceValues = NameType[leastUsedNameType].voiceType[leastUsedVoiceType as VoiceType] || [];
                 const leastUsedVoiceValue = availableVoiceValues.reduce((least, current) => {
-                    // 현재 nameType과 voiceType에 대해서만 voiceValue 사용 횟수를 계산
-                    const leastCount = Array.from(usedCombinations).filter((combo: any) =>
-                        combo.startsWith(`${leastUsedNameType}-${leastUsedVoiceType}-${least}`)
-                    ).length;
-                    const currentCount = Array.from(usedCombinations).filter((combo: any) =>
-                        combo.startsWith(`${leastUsedNameType}-${leastUsedVoiceType}-${current}`)
-                    ).length;
+                    const leastKey = `${leastUsedNameType}-${leastUsedVoiceType}-${least}`;
+                    const currentKey = `${leastUsedNameType}-${leastUsedVoiceType}-${current}`;
 
-                    // 모든 값의 length가 같을 경우 랜덤하게 선택
+                    const leastCount = usedCombinations.voiceValues[leastKey] || 0;
+                    const currentCount = usedCombinations.voiceValues[currentKey] || 0;
+
                     if (leastCount === currentCount) {
                         return Math.random() < 0.5 ? current : least;
                     }
-
                     return currentCount < leastCount ? current : least;
                 }, availableVoiceValues[0]);
 
@@ -255,8 +284,13 @@ export default function Home() {
                 const containedSubChar = acc?.find((item: any) => item.originalText === `${detail?.type}${detail?.number}`);
 
                 // 사용된 조합 추가
-                usedCombinations.add(`${leastUsedNameType}-${leastUsedVoiceType}`);
-                usedCombinations.add(`${leastUsedNameType}-${leastUsedVoiceType}-${leastUsedVoiceValue}`);
+                const nameTypeKey = leastUsedNameType;
+                const voiceTypeKey = `${leastUsedNameType}-${leastUsedVoiceType}`;
+                const voiceValueKey = `${leastUsedNameType}-${leastUsedVoiceType}-${leastUsedVoiceValue}`;
+
+                usedCombinations.nameTypes[nameTypeKey] = (usedCombinations.nameTypes[nameTypeKey] || 0) + 1;
+                usedCombinations.voiceTypes[voiceTypeKey] = (usedCombinations.voiceTypes[voiceTypeKey] || 0) + 1;
+                usedCombinations.voiceValues[voiceValueKey] = (usedCombinations.voiceValues[voiceValueKey] || 0) + 1;
 
                 if (detail?.originalText && detail?.originalText.length > 0 && (containedMainChar || containedSubChar)) {
                     const containedChar = containedMainChar || containedSubChar;
@@ -312,14 +346,14 @@ export default function Home() {
         <div className={styles.page}>
             <main className={styles.main}>
                 <div>
-                    <h1>사용된 캐릭터</h1>
-                    {storedValue.map((value, idx) => (
-                        <div key={idx}>
-                            {value.type} {value.number}
-                        </div>
-                    ))}
+                    <h1>엑셀입력</h1>
+                    <textarea
+                        value={excelInput}
+                        onChange={handleExcelInputChange}
+                        style={{ width: '100%', height: '200px', marginBottom: '20px' }}
+                        placeholder="엑셀에서 복사한 텍스트를 붙여넣으세요"
+                    />
                 </div>
-                <h1>문자열</h1>
                 <input
                     type="text"
                     value={characterLine}

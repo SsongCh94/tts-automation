@@ -54,8 +54,8 @@ const initialValue: StoredItem[] = [
     {
         type: '남자',
         number: 15,
-        nameType: '베리',
-        voiceType: 'normal',
+        nameType: '지안',
+        voiceType: 'toneup',
         voiceValue: 1,
     },
     {
@@ -89,9 +89,9 @@ const initialValue: StoredItem[] = [
     {
         type: '여자',
         number: 3,
-        nameType: '베리',
-        voiceType: 'normal',
-        voiceValue: 3,
+        nameType: '지안',
+        voiceType: 'happy',
+        voiceValue: 1,
     },
 ];
 
