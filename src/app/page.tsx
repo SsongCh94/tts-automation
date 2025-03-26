@@ -30,19 +30,18 @@ export default function Home() {
         // 줄바꿈으로 분리하고 빈 줄 제거
         const lines = input.split('\n').filter((line) => line.trim());
 
+        console.log('<ssong> lines   ::', lines);
+
         // 각 줄을 totalCharacter 형식으로 변환
-        const converted = lines.map((line) => {
-            // 쉼표로 구분된 경우 첫 번째 값만 사용
-            const firstValue = line.split(',')[0].trim();
-            return `${firstValue}`;
-        });
+        // const converted = lines.map((line) => {
+        //     // 쉼표로 구분된 경우 첫 번째 값만 사용
+        //     const firstValue = line.split(',')[0].trim();
+        //     return `${firstValue}`;
+        // });
 
-        setConvertedInput(converted);
+        // setConvertedInput(converted);
+        setConvertedInput(lines);
     };
-
-    React.useEffect(() => {
-        console.log('<ssong> convertedInput   ::', convertedInput);
-    }, [convertedInput]);
 
     const handleGenerate = () => {
         if (!characterLine) {
@@ -61,6 +60,7 @@ export default function Home() {
         // 중복 제거된 totalCharacter 배열 생성
         const uniqueCharacters = Array.from(new Set(convertedInput));
 
+        console.log('<ssong> uniqueCharacters   ::', uniqueCharacters);
         // 각 캐릭터를 분석하여 type과 number로 분리
         const characterDetails = uniqueCharacters
             .map((char) => {
@@ -94,6 +94,21 @@ export default function Home() {
 
         // 기존 storedValue의 조합을 먼저 추가
         storedValue.forEach((item) => {
+            // uniqueCharacters에 포함되는 캐릭터만 처리
+            const isIncluded = uniqueCharacters.some((char) => {
+                // char에서 type과 number 추출
+                const match = char.match(/([가-힣]+)(\d+)/);
+                if (!match) {
+                    console.log('<ssong> 등장하지 않는 인물   ::', char);
+                    return false;
+                }
+                console.log('<ssong> 등장하는 인물   ::', char);
+                const [, type, number] = match;
+                return item.type === type && item.number === parseInt(number);
+            });
+
+            if (!isIncluded) return;
+
             const nameType = item.nameType;
             const voiceType = item.voiceType;
             const voiceValue = item.voiceValue;
@@ -112,6 +127,7 @@ export default function Home() {
 
         // 모든 캐릭터 정보 생성
         const processedCharacters = characterDetails.reduce((acc: any, detail) => {
+            console.log('<ssong> usedCombinations   ::', usedCombinations);
             // initialValue에 있는지 확인
             const existingInStored = storedValue.find((item) => item.type === detail?.type && item.number === detail?.number);
 
@@ -319,6 +335,10 @@ export default function Home() {
 
         const getResult = (type: 'character' | 'voice') => {
             return processedCharacters.reduce((acc: string, curr: any, idx: number) => {
+                if (curr?.originalText) {
+                    console.log('<ssong> originalText   ::', curr?.originalText);
+                    console.log('<ssong> curr   ::', curr);
+                }
                 // 원본 문자열이 있으면 사용, 없으면 type+number 사용
                 const characterKey = curr?.originalText || `${curr?.type}${curr?.number}`;
 
@@ -328,6 +348,10 @@ export default function Home() {
                 return acc;
             }, '');
         };
+
+        if (getResult('character').includes('기타')) {
+            alert('기타 캐릭터가 있습니다.');
+        }
 
         setGeneratedCharacterLine(`=ARRAY_CONSTRAIN(ARRAYFORMULA(IFERROR(IFS(${getResult('character')}),"기타")), 1, 1)`);
         setGeneratedVoiceLine(`=ARRAY_CONSTRAIN(ARRAYFORMULA(IFERROR(IFS(${getResult('voice')}),"기타")), 1, 1)`);
