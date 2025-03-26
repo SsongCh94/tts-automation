@@ -113,6 +113,42 @@ const initialChangableValue: ChangableItem[] = [
         type: '남자아이',
         number: 26,
     },
+    {
+        type: '남자아이',
+        number: 29,
+    },
+    {
+        type: '남자아이',
+        number: 30,
+    },
+    {
+        type: '할아버지',
+        number: 32,
+    },
+    {
+        type: '할아버지',
+        number: 33,
+    },
+    {
+        type: '할아버지',
+        number: 34,
+    },
+    {
+        type: '남자아이',
+        number: 35,
+    },
+    {
+        type: '남자아이',
+        number: 36,
+    },
+    {
+        type: '남자아이',
+        number: 37,
+    },
+    {
+        type: '남자아이',
+        number: 38,
+    },
 ];
 
 export const useValueStore = create<ValueStore>((set) => ({
