@@ -14,7 +14,7 @@ interface UsedCombinations {
 }
 
 export default function Home() {
-    const [characterLine, setCharacterLine] = React.useState<string>('Q4');
+    const [characterLine, setCharacterLine] = React.useState<string>('R3');
     const [excelInput, setExcelInput] = React.useState<string>('');
     const [convertedInput, setConvertedInput] = React.useState<string[]>([]);
 
@@ -353,8 +353,8 @@ export default function Home() {
             alert('기타 캐릭터가 있습니다.');
         }
 
-        setGeneratedCharacterLine(`=ARRAY_CONSTRAIN(ARRAYFORMULA(IFERROR(IFS(${getResult('character')}),"기타")), 1, 1)`);
-        setGeneratedVoiceLine(`=ARRAY_CONSTRAIN(ARRAYFORMULA(IFERROR(IFS(${getResult('voice')}),"기타")), 1, 1)`);
+        setGeneratedCharacterLine(`=(IFERROR(IFS(${getResult('character')}),"기타")`);
+        setGeneratedVoiceLine(`=(IFERROR(IFS(${getResult('voice')}),"기타")`);
     };
 
     const handleDelete = (idx: number) => {
@@ -406,10 +406,10 @@ export default function Home() {
                     ))}
                 </div>
                 <h1>저장된 변동 값</h1>
-                <div>
+                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                     {changableValue.map((value, idx) => (
-                        <div key={idx} style={{ display: 'flex', gap: '50px', marginBottom: '10px' }}>
-                            <div style={{ fontSize: '24px' }}>
+                        <div key={idx} style={{ display: 'flex', gap: '10px', margin: '0 30px 10px 0px' }}>
+                            <div style={{ fontSize: '24px', width: '150px' }}>
                                 {/* {value.type} {value.number} {value.nameType} {value.voiceType} {value.voiceValue} */}
                                 {value.type} {value.number}
                             </div>

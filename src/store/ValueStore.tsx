@@ -22,88 +22,108 @@ interface ValueStore {
     deleteChangableValue: (idx: number) => void;
 }
 
-const initialValue: StoredItem[] = [
+const initialValue = [
     {
         type: '남자',
-        number: 1,
+        number: 4, //444444444
         nameType: '우주',
         voiceType: 'angry',
-        voiceValue: 1,
+        voiceValue: 2,
     },
     {
         type: '남자',
-        number: 2,
+        number: 9, // 999999999
         nameType: '준호',
         voiceType: 'normal',
         voiceValue: 3,
     },
     {
         type: '남자',
-        number: 3,
+        number: 23, //// 23 23  23 23
+        nameType: '준호',
+        voiceType: 'angry',
+        voiceValue: 1,
+    },
+    {
+        type: '남자',
+        number: 5,   // 55555555
         nameType: '지안',
-        voiceType: 'toneup',
+        voiceType: 'sad',
         voiceValue: 1,
     },
     {
         type: '남자',
-        number: 4,
-        nameType: '창배',
-        voiceType: 'happy',
-        voiceValue: 1,
-    },
-    {
-        type: '남자',
-        number: 5,
+        number: 1, // 111111111
         nameType: '지안',
         voiceType: 'normal',
         voiceValue: 1,
     },
     {
         type: '남자',
-        number: 16,
+        number: 2, // 22222222
         nameType: '지안',
-        voiceType: 'sad',
+        voiceType: 'toneup',
         voiceValue: 1,
     },
     {
         type: '여자',
-        number: 1,
+        number: 3, // 3333333
         nameType: '베리',
         voiceType: 'normal',
         voiceValue: 2,
     },
     {
         type: '여자',
-        number: 2,
+        number: 2, // 2222222
         nameType: '지안',
         voiceType: 'happy',
         voiceValue: 1,
     },
     {
-        type: '남자',
-        number: 9,
-        nameType: '준호',
-        voiceType: 'angry',
-        voiceValue: 1,
+        type: '여자',
+        number: 1, // 111111
+        nameType: '지안',
+        voiceType: 'sad',
+        voiceValue: 2,
     },
 ];
 
 const initialChangableValue: ChangableItem[] = [
     {
         type: '남자아이',
+        number: 3,
+    },
+    {
+        type: '남자아이',
+        number: 7,
+    },
+    {
+        type: '남자아이',
+        number: 8,
+    },
+    {
+        type: '남자아이',
+        number: 10,
+    },
+    {
+        type: '남자아이',
         number: 11,
     },
     {
         type: '남자아이',
-        number: 12,
-    },
-    {
-        type: '할아버지',
         number: 13,
     },
     {
-        type: '여자아이',
-        number: 4,
+        type: '남자아이',
+        number: 14,
+    },
+    {
+        type: '남자아이',
+        number: 15,
+    },
+    {
+        type: '남자아이',
+        number: 16,
     },
     {
         type: '남자아이',
@@ -111,9 +131,34 @@ const initialChangableValue: ChangableItem[] = [
     },
     {
         type: '남자아이',
-        number: 26,
+        number: 19,
+    },
+    {
+        type: '남자아이',
+        number: 24,
+    },
+    {
+        type: '여자아이',
+        number: 5,
+    },
+    {
+        type: '여자아이',
+        number: 6,
+    },
+    {
+        type: '여자아이',
+        number: 7,
+    },
+    {
+        type: '여자아이',
+        number: 8,
+    },
+    {
+        type: '할아버지',
+        number: 20,
     },
 ];
+
 
 export const useValueStore = create<ValueStore>((set) => ({
     storedValue: initialValue,
