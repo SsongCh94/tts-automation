@@ -46,7 +46,7 @@ const initialValue = [
     },
     {
         type: '남자',
-        number: 5,   // 55555555
+        number: 5, // 55555555
         nameType: '지안',
         voiceType: 'sad',
         voiceValue: 1,
@@ -193,8 +193,11 @@ const initialChangableValue: ChangableItem[] = [
         type: '남자아이',
         number: 38,
     },
+    {
+        type: '남자',
+        number: 123123,
+    },
 ];
-
 
 export const useValueStore = create<ValueStore>((set) => ({
     storedValue: initialValue,
