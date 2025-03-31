@@ -195,7 +195,7 @@ const initialChangableValue: ChangableItem[] = [
     },
     {
         type: '남자',
-        number: 123123,
+        number: 122133123,
     },
 ];
 
