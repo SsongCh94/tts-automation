@@ -25,65 +25,93 @@ interface ValueStore {
 const initialValue = [
     {
         type: '남자',
-        number: 4, //444444444
+        number: 1, // 강무한
         nameType: '우주',
         voiceType: 'angry',
         voiceValue: 2,
     },
     {
         type: '남자',
-        number: 9, // 999999999
+        number: 2, // 공수식
         nameType: '준호',
         voiceType: 'normal',
         voiceValue: 3,
     },
     {
         type: '남자',
-        number: 23, //// 23 23  23 23
+        number: 3, // 금발머리
+        nameType: '우주',
+        voiceType: 'sad',
+        voiceValue: 3,
+    },
+    {
+        type: '남자',
+        number: 28, //// 캠프장?
         nameType: '준호',
         voiceType: 'angry',
         voiceValue: 1,
     },
     {
         type: '남자',
-        number: 5, // 55555555
+        number: 10, // 안경태
         nameType: '지안',
         voiceType: 'sad',
         voiceValue: 1,
     },
     {
         type: '남자',
-        number: 1, // 111111111
+        number: 8, // 우호진
         nameType: '지안',
         voiceType: 'normal',
         voiceValue: 1,
     },
     {
         type: '남자',
-        number: 2, // 22222222
+        number: 9, // 태빈
         nameType: '지안',
         voiceType: 'toneup',
         voiceValue: 1,
     },
     {
+        type: '남자',
+        number: 15, // 교장
+        nameType: '창배',
+        voiceType: 'happy',
+        voiceValue: 1,
+    },
+    {
+        type: '남자',
+        number: 5, // 처음 할아버지
+        nameType: '창배',
+        voiceType: 'sad',
+        voiceValue: 1,
+    },
+    {
         type: '여자',
-        number: 3, // 3333333
+        number: 5, //나새리
         nameType: '베리',
         voiceType: 'normal',
         voiceValue: 2,
     },
     {
         type: '여자',
-        number: 2, // 2222222
+        number: 3, // 안경잽이
+        nameType: '지안',
+        voiceType: 'angry',
+        voiceValue: 3,
+    },
+    {
+        type: '여자',
+        number: 4, // 하소연
         nameType: '지안',
         voiceType: 'happy',
         voiceValue: 1,
     },
     {
         type: '여자',
-        number: 1, // 111111
+        number: 8, // 여선생
         nameType: '지안',
-        voiceType: 'sad',
+        voiceType: 'tonemid',
         voiceValue: 2,
     },
 ];
@@ -91,91 +119,27 @@ const initialValue = [
 const initialChangableValue: ChangableItem[] = [
     {
         type: '남자아이',
-        number: 3,
-    },
-    {
-        type: '남자아이',
         number: 7,
     },
     {
         type: '남자아이',
-        number: 8,
-    },
-    {
-        type: '남자아이',
-        number: 10,
-    },
-    {
-        type: '남자아이',
-        number: 11,
-    },
-    {
-        type: '남자아이',
-        number: 13,
-    },
-    {
-        type: '남자아이',
-        number: 14,
-    },
-    {
-        type: '남자아이',
-        number: 15,
-    },
-    {
-        type: '남자아이',
-        number: 16,
-    },
-    {
-        type: '남자아이',
-        number: 18,
-    },
-    {
-        type: '남자아이',
-        number: 19,
+        number: 23,
     },
     {
         type: '남자아이',
         number: 24,
     },
     {
-        type: '여자아이',
-        number: 5,
-    },
-    {
-        type: '여자아이',
-        number: 6,
-    },
-    {
-        type: '여자아이',
-        number: 7,
-    },
-    {
-        type: '여자아이',
-        number: 8,
-    },
-    {
-        type: '할아버지',
-        number: 20,
+        type: '남자아이',
+        number: 25,
     },
     {
         type: '남자아이',
-        number: 29,
+        number: 26,
     },
     {
         type: '남자아이',
-        number: 30,
-    },
-    {
-        type: '할아버지',
-        number: 32,
-    },
-    {
-        type: '할아버지',
-        number: 33,
-    },
-    {
-        type: '할아버지',
-        number: 34,
+        number: 27,
     },
     {
         type: '남자아이',
@@ -194,8 +158,40 @@ const initialChangableValue: ChangableItem[] = [
         number: 38,
     },
     {
-        type: '남자',
-        number: 13322133123,
+        type: '남자아이',
+        number: 40,
+    },
+    {
+        type: '남자아이',
+        number: 41,
+    },
+    {
+        type: '남자아이',
+        number: 42,
+    },
+    {
+        type: '남자아이',
+        number: 43,
+    },
+    {
+        type: '남자아이',
+        number: 44,
+    },
+    {
+        type: '남자아이',
+        number: 45,
+    },
+    {
+        type: '여자아이',
+        number: 2,
+    },
+    {
+        type: '여자아이',
+        number: 9,
+    },
+    {
+        type: '여자아이',
+        number: 11,
     },
 ];
 
