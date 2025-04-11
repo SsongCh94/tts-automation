@@ -425,11 +425,41 @@ export default function Home() {
                 </button>
                 <h1>생성된 문자열</h1>
                 <div style={{ fontSize: '30px' }}>
-                    캐릭터라인 :: <div>{generatedCharacterLine}</div>
+                    <div>
+                        캐릭터라인 :: <div>{generatedCharacterLine}</div>
+                        <CopyButton text={generatedCharacterLine} />
+                    </div>
                     <br />
-                    보이스라인 :: <div>{generatedVoiceLine}</div>
+                    <div>
+                        보이스라인 :: <div>{generatedVoiceLine}</div>
+                        <CopyButton text={generatedVoiceLine} />
+                    </div>
                 </div>
             </main>
         </div>
     );
 }
+
+const CopyButton = ({ text }: { text: string }) => {
+    // 복사 기능
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+    };
+
+    return (
+        <button
+            onClick={() => copyToClipboard(text)}
+            style={{
+                padding: '5px 10px',
+                fontSize: '16px',
+                cursor: 'pointer',
+                backgroundColor: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+            }}
+        >
+            복사
+        </button>
+    );
+};
