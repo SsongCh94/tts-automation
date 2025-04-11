@@ -42,156 +42,119 @@ const initialValue = [
         number: 3, // 금발머리
         nameType: '우주',
         voiceType: 'sad',
-        voiceValue: 3,
+        voiceValue: 1,
     },
     {
         type: '남자',
-        number: 28, //// 캠프장?
+        number: 4, // 교육부 장관
+        nameType: '창배',
+        voiceType: 'happy',
+        voiceValue: 1,
+    },
+    {
+        type: '남자',
+        number: 5, // 캠프장
         nameType: '준호',
-        voiceType: 'angry',
+        voiceType: 'toneup',
         voiceValue: 1,
     },
     {
         type: '남자',
-        number: 10, // 안경태
-        nameType: '지안',
-        voiceType: 'sad',
-        voiceValue: 1,
-    },
-    {
-        type: '남자',
-        number: 8, // 우호진
+        number: 6, // 우호진
         nameType: '지안',
         voiceType: 'normal',
         voiceValue: 1,
     },
     {
         type: '남자',
-        number: 9, // 태빈
+        number: 7, // 태빈
         nameType: '지안',
         voiceType: 'toneup',
         voiceValue: 1,
     },
     {
         type: '남자',
-        number: 15, // 교장
+        number: 8,   // 안경태
+        nameType: '지안',
+        voiceType: 'sad',
+        voiceValue: 1,
+    },
+    {
+        type: '남자',
+        number: 16, // 교장
         nameType: '창배',
         voiceType: 'happy',
         voiceValue: 1,
     },
     {
         type: '남자',
-        number: 5, // 처음 할아버지
-        nameType: '창배',
-        voiceType: 'sad',
-        voiceValue: 1,
+        number: 19, // 뿔태선생
+        nameType: '준호',
+        voiceType: 'toneup',
+        voiceValue: 3,
     },
     {
         type: '여자',
-        number: 5, //나새리
+        number: 1, // 나새리
         nameType: '베리',
         voiceType: 'normal',
         voiceValue: 2,
     },
     {
         type: '여자',
-        number: 3, // 안경잽이
-        nameType: '지안',
-        voiceType: 'angry',
-        voiceValue: 3,
-    },
-    {
-        type: '여자',
-        number: 4, // 하소연
+        number: 2, // 하소연
         nameType: '지안',
         voiceType: 'happy',
         voiceValue: 1,
     },
     {
         type: '여자',
-        number: 8, // 여선생
+        number: 3, // 안경여자아이
         nameType: '지안',
         voiceType: 'tonemid',
         voiceValue: 2,
+    },
+    {
+        type: '여자',
+        number: 4, // 여선생
+        nameType: '지안',
+        voiceType: 'angry',
+        voiceValue: 1,
     },
 ];
 
 const initialChangableValue: ChangableItem[] = [
     {
         type: '남자아이',
-        number: 7,
+        number: 11,
+    },
+    {
+        type: '남자아이',
+        number: 12,
+    },
+    {
+        type: '남자아이',
+        number: 15,
+    },
+    {
+        type: '남자아이',
+        number: 18,
+    },
+    {
+        type: '남자아이',
+        number: 22,
     },
     {
         type: '남자아이',
         number: 23,
     },
     {
-        type: '남자아이',
-        number: 24,
-    },
-    {
-        type: '남자아이',
-        number: 25,
-    },
-    {
-        type: '남자아이',
-        number: 26,
-    },
-    {
-        type: '남자아이',
-        number: 27,
-    },
-    {
-        type: '남자아이',
-        number: 35,
-    },
-    {
-        type: '남자아이',
-        number: 36,
-    },
-    {
-        type: '남자아이',
-        number: 37,
-    },
-    {
-        type: '남자아이',
-        number: 38,
-    },
-    {
-        type: '남자아이',
-        number: 40,
-    },
-    {
-        type: '남자아이',
-        number: 41,
-    },
-    {
-        type: '남자아이',
-        number: 42,
-    },
-    {
-        type: '남자아이',
-        number: 43,
-    },
-    {
-        type: '남자아이',
-        number: 44,
-    },
-    {
-        type: '남자아이',
-        number: 45,
+        type: '여자아이',
+        number: 5,
     },
     {
         type: '여자아이',
-        number: 2,
-    },
-    {
-        type: '여자아이',
-        number: 9,
-    },
-    {
-        type: '여자아이',
-        number: 11,
+        number: 6,
     },
 ];
 
