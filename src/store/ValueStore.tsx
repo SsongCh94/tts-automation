@@ -74,7 +74,7 @@ const initialValue = [
     },
     {
         type: '남자',
-        number: 8,   // 안경태
+        number: 8, // 안경태
         nameType: '지안',
         voiceType: 'sad',
         voiceValue: 1,
@@ -147,6 +147,10 @@ const initialChangableValue: ChangableItem[] = [
     {
         type: '남자아이',
         number: 23,
+    },
+    {
+        type: '남자아이',
+        number: 24,
     },
     {
         type: '여자아이',
